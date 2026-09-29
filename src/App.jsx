@@ -1,37 +1,96 @@
-import { useEffect, useState } from "react";
-import { auth, db } from "./firebase";
+import { useState } from "react";
+
+import { useAuth } from "./context/AuthContext";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Navbar from "./components/Navbar";
+
 
 function App() {
-  const [firebaseStatus, setFirebaseStatus] = useState("Checking...");
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    try {
-      if (auth && db) {
-        setFirebaseStatus("Firebase connected successfully");
-      }
-    } catch (error) {
-      console.error("Firebase connection error:", error);
-      setFirebaseStatus("Firebase connection failed");
-    }
-  }, []);
+  const [showRegister, setShowRegister] =
+    useState(false);
+
+
+  if (loading) {
+    return (
+      <div style={{ padding: "40px" }}>
+        Loading application...
+      </div>
+    );
+  }
+
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <h1>Real-Time Cloud Event RSVP Tracker</h1>
+    <>
 
-        <p>{firebaseStatus}</p>
-      </div>
-    </div>
+      {/* ============================= */}
+      {/* NAVBAR */}
+      {/* ============================= */}
+
+      <Navbar />
+
+
+      {/* ============================= */}
+      {/* AUTHENTICATED USER */}
+      {/* ============================= */}
+
+      {user ? (
+        <Dashboard />
+      ) : showRegister ? (
+
+        <>
+          <Register />
+
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "10px",
+              marginBottom: "30px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setShowRegister(false)
+              }
+            >
+              Already have an account? Login
+            </button>
+          </div>
+        </>
+
+      ) : (
+
+        <>
+          <Login />
+
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "10px",
+              marginBottom: "30px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setShowRegister(true)
+              }
+            >
+              Create a new account
+            </button>
+          </div>
+        </>
+
+      )}
+
+    </>
   );
 }
+
 
 export default App;
